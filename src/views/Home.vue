@@ -1,20 +1,30 @@
 <template>
 	<div class="warpper">
-		<Button type="primary" @click="onVisible">动态切换</Button>
-		<div>
+		<!-- <div>
+			<Button type="primary" @click="onVisible">动态切换</Button>
 			<Switch v-model:checked="visible" />
-		</div>
-		<Row>
-			<!-- <Col :span="8"> col-8 </Col>
-			<Col :span="8"> col-8 </Col>
-			<Col :span="8"> col-8 </Col> -->
-		</Row>
+		</div> -->
+		<a-card title="走马灯" style="width: 400px">
+			<a-carousel autoplay>
+				<div v-for="(item, index) in orginData.banerList" :key="index">
+					<img :src="item" />
+				</div>
+			</a-carousel>
+		</a-card>
+		<a-row type="flex">
+			<a-col :span="6" v-for="item in orginData.cateGoryList" :key="item.name">
+				<a-card :title="item.name">
+					<img :src="item.icon" />
+					<p>{{ item.name }}</p>
+				</a-card>
+			</a-col>
+		</a-row>
 	</div>
 </template>
 
 <script>
-import { defineComponent, onMounted, reactive } from 'vue'
-import { Switch, Button, Row, Col } from 'ant-design-vue'
+import { defineComponent, onMounted, reactive, ref } from 'vue'
+import { Switch, Button, Row, Col, Card, Carousel } from 'ant-design-vue'
 import useToogle from '../hooks/useToogle'
 import request from '../utils/request'
 
@@ -24,11 +34,13 @@ export default defineComponent({
 		Switch,
 		Button,
 		Row,
-		Col
+		Col,
+		Card,
+		Carousel
 	},
 	setup() {
 		const { visible, onVisible } = useToogle(true)
-		let orginData = reactive()
+		let orginData = ref({})
 
 		onMounted(async () => {
 			const resp = await request('/index', {
@@ -36,7 +48,7 @@ export default defineComponent({
 			})
 			console.log(resp)
 			const { banerList, brandList, cateGoryList, hotList } = resp
-			orginData = {
+			orginData.value = {
 				banerList,
 				brandList,
 				cateGoryList,
